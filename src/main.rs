@@ -143,7 +143,9 @@ impl ZellijPlugin for State {
 
     fn render(&mut self, _rows: usize, _cols: usize) {
         let mode_info = &self.mode_info;
-        let output = if !(self.hide_in_base_mode && Some(mode_info.mode) == mode_info.base_mode) {
+        let is_base_mode = Some(mode_info.mode) == mode_info.base_mode;
+        let hide_hints = self.hide_in_base_mode && is_base_mode && mode_info.mode != InputMode::Locked;
+        let output = if !hide_hints {
             let keymap = get_keymap_for_mode(mode_info);
             let parts = render_hints_for_mode(mode_info.mode, &keymap, &mode_info.style.colors);
 
@@ -670,6 +672,10 @@ fn render_hints_for_mode(
             }
 
             add_hint(&mut parts, &select_keys, "select", colors);
+        }
+        InputMode::Locked => {
+            let unlock_keys = find_keys_for_actions(keymap, &[Action::SwitchToMode(InputMode::Normal)], true);
+            add_hint(&mut parts, &unlock_keys, "unlock", colors);
         }
         _ => {
             let keys =
