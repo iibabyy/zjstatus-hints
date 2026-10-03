@@ -125,7 +125,7 @@ impl ZellijPlugin for State {
             PermissionType::MessageAndLaunchOtherPlugins,
         ]);
 
-        set_selectable(false);
+        
         subscribe(&[EventType::ModeUpdate, EventType::SessionUpdate]);
     }
 
